@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      width: 420px;
+      background: #f5f7fa;
+      color: #222;
+      font-size: 13px;
+    }
+
+    header {
+      background: #00aaff;
+      color: white;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    header h1 { font-size: 14px; font-weight: 600; }
+    header small { font-size: 11px; opacity: 0.85; }
+
+    .tabs {
+      display: flex;
+      background: white;
+      border-bottom: 2px solid #e0e0e0;
+    }
+    .tab {
+      flex: 1;
+      padding: 9px;
+      text-align: center;
+      cursor: pointer;
+      font-size: 12px;
+      color: #666;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+    }
+    .tab.active { color: #00aaff; border-bottom-color: #00aaff; font-weight: 600; }
+
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    /* ---- Scrape panel ---- */
+    #scrape-panel { padding: 16px; }
+    #btn-scrape {
+      width: 100%;
+      padding: 10px;
+      background: #00aaff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    #btn-scrape:disabled { background: #aaa; cursor: default; }
+
+    .from-month-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .from-month-row label {
+      font-size: 12px;
+      color: #555;
+      white-space: nowrap;
+    }
+    .from-month-row input[type=month] {
+      flex: 1;
+      padding: 5px 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+    #scrape-status {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #555;
+      min-height: 20px;
+      text-align: center;
+    }
+    .meta-info {
+      margin-top: 10px;
+      background: white;
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-size: 11px;
+      color: #888;
+      line-height: 1.8;
+    }
+
+    /* ---- Analysis panel ---- */
+    #analysis-panel { padding: 12px 14px; max-height: 480px; overflow-y: auto; }
+
+    .section-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #555;
+      margin: 12px 0 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .bar-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 5px;
+      gap: 8px;
+    }
+    .bar-label {
+      width: 150px;
+      font-size: 12px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex-shrink: 0;
+    }
+    .bar-wrap {
+      flex: 1;
+      background: #eee;
+      border-radius: 3px;
+      height: 14px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      background: #00aaff;
+      border-radius: 3px;
+      transition: width 0.4s;
+    }
+    .bar-count {
+      font-size: 11px;
+      color: #888;
+      width: 30px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .summary-card {
+      background: white;
+      border-radius: 6px;
+      padding: 10px;
+      text-align: center;
+    }
+    .summary-card .num {
+      font-size: 22px;
+      font-weight: 700;
+      color: #00aaff;
+    }
+    .summary-card .lbl {
+      font-size: 11px;
+      color: #888;
+      margin-top: 2px;
+    }
+
+    .empty { text-align: center; padding: 30px; color: #aaa; }
+
+    /* ---- History panel ---- */
+    #history-panel { max-height: 480px; overflow-y: auto; }
+    .h-item {
+      padding: 9px 14px;
+      border-bottom: 1px solid #eee;
+      background: white;
+    }
+    .h-item:hover { background: #f0f8ff; }
+    .h-title { font-size: 12px; font-weight: 500; }
+    .h-meta { font-size: 11px; color: #999; margin-top: 2px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .badge {
+      background: #e6f4ff;
+      color: #00aaff;
+      border-radius: 3px;
+      padding: 1px 5px;
+      font-size: 10px;
+    }
+
+    /* toolbar */
+    .toolbar {
+      display: flex;
+      gap: 6px;
+      padding: 8px 12px;
+      background: white;
+      border-bottom: 1px solid #eee;
+    }
+    .toolbar button {
+      padding: 5px 10px;
+      border: none;
+      border-radius: 4px;
+      font-size: 11px;
+      cursor: pointer;
+    }
+    #btn-export { background: #00aaff; color: white; }
+    #btn-clear { background: #f1f1f1; color: #555; }
+    #toolbar-count { margin-left: auto; font-size: 11px; color: #999; align-self: center; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>📚 NativeCamp Tracker</h1>
+  <small id="last-scraped">未取得</small>
+</header>
+
+<div class="tabs">
+  <div class="tab active" data-tab="scrape">取得</div>
+  <div class="tab" data-tab="analysis">分析</div>
+  <div class="tab" data-tab="history">履歴</div>
+</div>
+
+<!-- 取得パネル -->
+<div id="scrape-panel" class="panel active">
+  <div class="from-month-row">
+    <label for="from-month">取得開始月</label>
+    <input type="month" id="from-month" min="2022-01">
+  </div>
+  <div style="display:flex;gap:8px;margin-bottom:0;">
+    <button id="btn-scrape" style="flex:1;">📥 履歴を取得</button>
+    <button id="btn-import" style="padding:10px 12px;background:#f0f8ff;color:#00aaff;border:1.5px solid #00aaff;border-radius:6px;font-size:13px;cursor:pointer;font-weight:600;white-space:nowrap;">📂 インポート</button>
+  </div>
+  <input type="file" id="import-file" accept=".json" style="display:none;">
+  <div id="scrape-status"></div>
+  <div id="scrape-warnings" style="display:none;margin-top:8px;padding:8px 10px;background:#fffbeb;border:1px solid #f59e0b;border-radius:6px;font-size:11px;color:#92400e;line-height:1.8;"></div>
+  <div class="meta-info" id="meta-info" style="display:none"></div>
+</div>
+
+<!-- 分析パネル -->
+<div id="analysis-panel" class="panel">
+  <div id="analysis-content"><div class="empty">先に「取得」タブで履歴を取得してください。</div></div>
+</div>
+
+<!-- 履歴パネル -->
+<div id="history-panel" class="panel">
+  <div class="toolbar">
+    <button id="btn-export">JSONエクスポート</button>
+    <button id="btn-clear">消去</button>
+    <span id="toolbar-count"></span>
+  </div>
+  <div id="history-list"></div>
+</div>
+
+<script src="popup.js"></script>
+</body>
+</html>
