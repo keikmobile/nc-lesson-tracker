@@ -204,6 +204,11 @@ function renderHistory() {
           ${r.course ? `<span class="badge">${r.course}</span>` : ''}
           ${r.level  ? `<span class="badge">${r.level}</span>`  : ''}
         </div>
+        ${(r.teacher_name_en || r.teacher_country) ? `
+        <div class="h-teacher">
+          ${r.teacher_name_en ? `<span>${r.teacher_name_en}${r.teacher_name_ja ? ` (${r.teacher_name_ja})` : ''}</span>` : ''}
+          ${r.teacher_country ? `<span class="badge">${r.teacher_country}</span>` : ''}
+        </div>` : ''}
       </div>
     `).join('');
   });

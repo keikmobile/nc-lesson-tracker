@@ -119,7 +119,16 @@ function parseHTML(html, month) {
       ? parseInt(durationMatch[1].split(':')[0])
       : null;
 
-    records.push({ timestamp, course, level, topic, textbook_url, duration_min, month });
+    // 講師名（英語・日本語）を取得
+    const teacherMatch = block.match(/<p class="teacher-name">[\s\S]*?<b>([\s\S]*?)<\/b>([\s\S]*?)<br>/);
+    const teacher_name_en = teacherMatch ? teacherMatch[1].trim() : null;
+    const teacher_name_ja = teacherMatch ? teacherMatch[2].replace(/<[^>]+>/g, '').trim() : null;
+
+    // 国籍を取得
+    const countryMatch = block.match(/<span class="country_name">([\s\S]*?)<\/span>/);
+    const teacher_country = countryMatch ? countryMatch[1].trim() : null;
+
+    records.push({ timestamp, course, level, topic, textbook_url, duration_min, teacher_name_en, teacher_name_ja, teacher_country, month });
   }
 
   return records;

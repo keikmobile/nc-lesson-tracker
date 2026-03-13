@@ -57,13 +57,16 @@
 
 ```json
 {
-  "timestamp":    "2025-01-15T09:59:00",
-  "course":       "デイリートピック",
-  "level":        "ビジネス/経済",
-  "topic":        "11496:Ways to Stay Motivated at Work",
-  "textbook_url": "https://nativecamp.net/textbook/page-detail/1/10001",
-  "duration_min": 26,
-  "month":        "202501"
+  "timestamp":       "2025-01-15T09:59:00",
+  "course":          "デイリートピック",
+  "level":           "ビジネス/経済",
+  "topic":           "11496:Ways to Stay Motivated at Work",
+  "textbook_url":    "https://nativecamp.net/textbook/page-detail/1/10001",
+  "duration_min":    26,
+  "teacher_name_en": "Teacher Name",
+  "teacher_name_ja": "講師名",
+  "teacher_country": "南アフリカ",
+  "month":           "202501"
 }
 ```
 
@@ -74,7 +77,10 @@
 | `level` | string \| null | レベルまたはカテゴリ（例: 健康） |
 | `topic` | string \| null | トピック名（ID付きの場合あり） |
 | `textbook_url` | string \| null | 教材の URL |
-| `duration_min` | number \| null | 受講時間（分）。再スクレイプで取得 |
+| `duration_min` | number \| null | 受講時間（分） |
+| `teacher_name_en` | string \| null | 講師名（英語） |
+| `teacher_name_ja` | string \| null | 講師名（日本語） |
+| `teacher_country` | string \| null | 講師の国籍 |
 | `month` | string (YYYYMM) | 受講月 |
 
 ### ストレージ
@@ -106,6 +112,8 @@ https://nativecamp.net/lesson-history/page:N?month=YYYYMM
 | 日時 | `2025年01月15日 (水) 09:59` 形式のテキスト |
 | 教材情報 | `<a class="t_link" href="...">` の中の `<span>` |
 | 受講時間 | `attr-time-duration="26:00"` 属性 |
+| 講師名 | `<p class="teacher-name">` 内の `<b>` タグ（英語）とそのテキスト（日本語） |
+| 講師の国籍 | `<span class="country_name">` のテキスト |
 
 ---
 
