@@ -1,59 +1,65 @@
 # NativeCamp Lesson Tracker
 
+Chrome extension to collect and analyze NativeCamp lesson history.
 ネイティブキャンプのレッスン履歴を収集・分析する Chrome 拡張機能。
 
-## 概要
+## Overview / 概要
 
+Scrapes NativeCamp lesson history pages (`/lesson-history`), stores lesson data locally, and provides analytics. No data is sent to any external service.
 ネイティブキャンプのレッスン履歴ページ（`/lesson-history`）をスクレイピングし、受講データをローカルに保存・分析する。外部サービスへのデータ送信は一切行わない。
 
-## インストール
+## Installation / インストール
 
-1. このリポジトリをクローンまたは ZIP でダウンロード
-2. Chrome のアドレスバーに `chrome://extensions` を入力
-3. 右上の「デベロッパーモード」をオン
-4. 「パッケージ化されていない拡張機能を読み込む」→ `nc-tracker` フォルダを選択
+1. Clone this repository or download as ZIP / このリポジトリをクローンまたは ZIP でダウンロード
+2. Open `chrome://extensions` in Chrome / Chrome のアドレスバーに `chrome://extensions` を入力
+3. Enable Developer mode (top right) / 右上の「デベロッパーモード」をオン
+4. Click "Load unpacked" → select this directory / 「パッケージ化されていない拡張機能を読み込む」→ このフォルダを選択
 
-**前提**: ネイティブキャンプにログイン済みであること。
-
----
-
-## 機能
-
-### 取得タブ
-
-| 項目 | 内容 |
-|------|------|
-| 取得開始月 | デフォルトは今月。カレンダーで任意の月に変更可能 |
-| 履歴を取得 | 指定月から今月まで全ページを順番にスクレイピング |
-| JSONインポート | 既存の JSON ファイルを読み込んでストレージにマージ |
-
-**マージ仕様**: スクレイプとインポートどちらも `timestamp` をキーに重複除去。同じ `timestamp` が既存にある場合は新しいデータで上書きする（フィールド追加時の再取得に対応）。
-
-### 分析タブ
-
-| 項目 | 内容 |
-|------|------|
-| 総レッスン数 | 全レコード件数 |
-| 月平均レッスン数 | 総件数 ÷ 受講月数 |
-| 受講月数 | データがある月の数 |
-| 累計受講時間 | `duration_min` がある全レコードの合計（例: `399h 22m`） |
-| 平均レッスン時間 | `duration_min` がある全レコードの平均（分） |
-| コース別 / トピック TOP15 / レベル別 | 棒グラフ |
-| 時間帯別 | 朝（5〜11時）/ 昼（11〜17時）/ 夜（17〜5時）の件数・割合 |
-
-> `duration_min` は再スクレイプで取得されるフィールド。インポートした既存 JSON に含まれない場合は `—` 表示。
-
-### 履歴タブ
-
-- 全レコードを `timestamp` 降順で一覧表示
-- **JSONエクスポート**: `nativecamp-history-YYYY-MM-DD.json` として保存
-- **消去**: ストレージの全データを削除
+**Prerequisite / 前提**: Must be logged in to NativeCamp. / ネイティブキャンプにログイン済みであること。
 
 ---
 
-## データ仕様
+## Features / 機能
 
-### レコード構造
+### Fetch Tab / 取得タブ
+
+| Item / 項目 | Description / 内容 |
+|------|------|
+| Start month / 取得開始月 | Defaults to current month. Change via calendar. / デフォルトは今月。カレンダーで任意の月に変更可能 |
+| Fetch history / 履歴を取得 | Scrapes all pages from the specified month to current. / 指定月から今月まで全ページを順番にスクレイピング |
+| JSON import / JSONインポート | Load an existing JSON file and merge into storage. / 既存の JSON ファイルを読み込んでストレージにマージ |
+
+**Merge behavior / マージ仕様**: Both scraping and import deduplicate by `timestamp`. If the same `timestamp` already exists, the new data overwrites it (supports re-scraping after field additions).
+スクレイプとインポートどちらも `timestamp` をキーに重複除去。同じ `timestamp` が既存にある場合は新しいデータで上書きする（フィールド追加時の再取得に対応）。
+
+### Analysis Tab / 分析タブ
+
+| Item / 項目 | Description / 内容 |
+|------|------|
+| Total lessons / 総レッスン数 | Total record count / 全レコード件数 |
+| Monthly average / 月平均レッスン数 | Total ÷ active months / 総件数 ÷ 受講月数 |
+| Active months / 受講月数 | Number of months with data / データがある月の数 |
+| Total study time / 累計受講時間 | Sum of all `duration_min` (e.g. `399h 22m`) / `duration_min` がある全レコードの合計 |
+| Avg lesson time / 平均レッスン時間 | Average of all `duration_min` (minutes) / `duration_min` がある全レコードの平均（分） |
+| Teacher TOP15 / 講師 TOP15 | Bar chart of top 15 teachers by lesson count / 受講回数上位15名の棒グラフ |
+| Lesson type / レッスン種別 | Bar chart by lesson type / 種別ごとの受講回数棒グラフ |
+| Teacher country / 講師の国 | Bar chart by teacher nationality / 国別の受講回数棒グラフ |
+| Time of day / 時間帯別 | Morning (5–11) / Afternoon (11–17) / Evening (17–5) counts and percentages / 朝・昼・夜の件数・割合 |
+| Monthly trend / 月別推移 | Bar chart of lesson count per month / 月ごとの受講回数バーチャート |
+| Topic TOP15 *(NC only)* | Bar chart of top 15 topics / 上位15トピックの棒グラフ |
+| Level *(NC only)* | Bar chart by level/category / レベル・カテゴリ別棒グラフ |
+
+### History Tab / 履歴タブ
+
+- Lists all records in descending `timestamp` order. / 全レコードを `timestamp` 降順で一覧表示
+- **JSON export / JSONエクスポート**: Saves as `nativecamp-history-YYYY-MM-DD.json`
+- **Clear / 消去**: Deletes all data from storage. / ストレージの全データを削除
+
+---
+
+## Data Specification / データ仕様
+
+### Record Structure / レコード構造
 
 ```json
 {
@@ -71,98 +77,99 @@
 }
 ```
 
-| フィールド | 型 | 内容 |
+| Field / フィールド | Type / 型 | Description / 内容 |
 |---|---|---|
-| `timestamp` | string (ISO 8601) | 受講日時 |
-| `source` | string | データソース（固定値: `"nativecamp"`） |
-| `lesson_type` | string \| null | レッスンタイプ（例: デイリーニュース） |
-| `level` | string \| null | レベルまたはカテゴリ（例: 健康） |
-| `topic` | string \| null | トピック名（ID付きの場合あり） |
-| `textbook_url` | string \| null | 教材の URL |
-| `duration_min` | number \| null | 受講時間（分） |
-| `teacher_en` | string \| null | 講師名（英語） |
-| `teacher_ja` | string \| null | 講師名（日本語） |
-| `teacher_country` | string \| null | 講師の国籍 |
-| `month` | string (YYYYMM) | 受講月 |
+| `timestamp` | string (ISO 8601) | Lesson datetime / 受講日時 |
+| `source` | string | Data source, fixed `"nativecamp"` / データソース（固定値） |
+| `lesson_type` | string \| null | Lesson type (e.g. デイリーニュース) / レッスンタイプ |
+| `level` | string \| null | Level or category (e.g. 健康) / レベルまたはカテゴリ |
+| `topic` | string \| null | Topic name, may include ID / トピック名（ID付きの場合あり） |
+| `textbook_url` | string \| null | Textbook URL / 教材の URL |
+| `duration_min` | number \| null | Lesson duration in minutes / 受講時間（分） |
+| `teacher_en` | string \| null | Teacher name (English) / 講師名（英語） |
+| `teacher_ja` | string \| null | Teacher name (Japanese) / 講師名（日本語） |
+| `teacher_country` | string \| null | Teacher nationality / 講師の国籍 |
+| `month` | string (YYYYMM) | Lesson month / 受講月 |
 
-### ストレージ
+### Storage / ストレージ
 
-`chrome.storage.local` に以下のキーで保存。
+Saved in `chrome.storage.local` with the following keys. / `chrome.storage.local` に以下のキーで保存。
 
-| キー | 内容 |
+| Key / キー | Description / 内容 |
 |------|------|
-| `nc_history` | レコードの配列（`timestamp` 降順） |
-| `nc_last_scraped` | 最終取得日時（ISO 8601） |
+| `nc_history` | Array of records sorted by `timestamp` descending / レコードの配列（`timestamp` 降順） |
+| `nc_last_scraped` | Last scrape datetime (ISO 8601) / 最終取得日時（ISO 8601） |
 
 ---
 
-## スクレイピング仕様
+## Scraping Specification / スクレイピング仕様
 
-### 対象 URL
+### Target URL / 対象 URL
 
 ```
 https://nativecamp.net/lesson-history/page:N?month=YYYYMM
 ```
 
-- `page:1` から開始し、次ページリンクの有無でページネーションを判定
-- 月間 400ms、ページ間 300ms のウェイトを挟む
+- Starts from `page:1`; pagination determined by presence of next-page link. / `page:1` から開始し、次ページリンクの有無でページネーションを判定
+- 400ms delay between months, 300ms between pages. / 月間 400ms、ページ間 300ms のウェイトを挟む
 
-### パーサーが依存している HTML 構造
+### HTML Patterns the Parser Depends On / パーサーが依存している HTML 構造
 
-| 取得内容 | 依存パターン |
+| Data / 取得内容 | Pattern / 依存パターン |
 |----------|-------------|
-| 日時 | `2025年01月15日 (水) 09:59` 形式のテキスト |
-| 教材情報 | `<a class="t_link" href="...">` の中の `<span>` |
-| 受講時間 | `attr-time-duration="26:00"` 属性 |
-| 講師名 | `<p class="teacher-name">` 内の `<b>` タグ（英語）とそのテキスト（日本語） |
-| 講師の国籍 | `<span class="country_name">` のテキスト |
+| Datetime / 日時 | Text in `2025年01月15日 (水) 09:59` format |
+| Lesson info / 教材情報 | `<span>` inside `<a class="t_link" href="...">` |
+| Duration / 受講時間 | `attr-time-duration="26:00"` attribute |
+| Teacher name / 講師名 | `<b>` (English) and text node (Japanese) inside `<p class="teacher-name">` — boundary is `</a>`, not `<br>` |
+| Teacher nationality / 講師の国籍 | Text of `<span class="country_name">` |
 
 ---
 
-## 仕様変化検知（sanityCheck）
+## Sanity Check / 仕様変化検知
 
+Automatically checks each month's records after scraping and warns if NativeCamp's HTML structure may have changed. Warnings appear as **⚠️** in the popup.
 取得完了後に各月のレコードを自動チェックし、NC 側の HTML 構造変化を検知する。問題があればポップアップに **⚠️ 警告** として表示する。
 
-| チェック条件 | 閾値 | 意味 |
+| Condition / チェック条件 | Threshold / 閾値 | Meaning / 意味 |
 |---|---|---|
-| レコード件数が 0 | — | HTML 構造変化またはログイン切れ |
-| `timestamp` 取得失敗 | 30% 超 | 日時フォーマット変化の可能性 |
-| `lesson_type` 取得失敗 | 50% 超 | 教材リンク構造変化の可能性 |
-| `duration_min` 取得失敗 | 50% 超 | 受講時間属性変化の可能性 |
+| 0 records / レコード件数が 0 | — | HTML structure change or not logged in / HTML 構造変化またはログイン切れ |
+| `timestamp` failures | >30% | Date format may have changed / 日時フォーマット変化の可能性 |
+| `lesson_type` failures | >50% | Lesson link structure may have changed / 教材リンク構造変化の可能性 |
+| `duration_min` failures | >50% | Duration attribute may have changed / 受講時間属性変化の可能性 |
 
-### 警告が出たときの対処
+### When warnings appear / 警告が出たときの対処
 
-1. ログイン状態を確認（件数 0 の場合）
-2. ネイティブキャンプのレッスン履歴ページを「名前を付けて保存」で手元に保存
-3. そのファイルを AI に渡して `parseHTML` 関数を書き直す
+1. Check login status (if 0 records) / ログイン状態を確認（件数 0 の場合）
+2. Save the NativeCamp lesson history page locally ("Save As") / ネイティブキャンプのレッスン履歴ページを「名前を付けて保存」で手元に保存
+3. Pass the file to an AI to rewrite the `parseHTML` function / そのファイルを AI に渡して `parseHTML` 関数を書き直す
 
 ---
 
-## ファイル構成
+## File Structure / ファイル構成
 
 ```
 nc-tracker/
-├── manifest.json    # 拡張機能設定（Manifest V3）
-├── background.js    # Service Worker（スクレイピング・データ管理）
-├── popup.html       # ポップアップ UI
-├── popup.js         # ポップアップのロジック
+├── manifest.json    # Extension config (Manifest V3) / 拡張機能設定
+├── background.js    # Service Worker (scraping & data management) / スクレイピング・データ管理
+├── popup.html       # Popup UI / ポップアップ UI
+├── popup.js         # Popup logic / ポップアップのロジック
 └── icons/
     ├── icon16.png
     ├── icon48.png
     └── icon128.png
 ```
 
-### パーミッション
+### Permissions / パーミッション
 
-| パーミッション | 用途 |
+| Permission / パーミッション | Purpose / 用途 |
 |---|---|
-| `storage` | レッスン履歴の保存 |
-| `host_permissions: nativecamp.net/*` | レッスン履歴ページへのアクセス |
+| `storage` | Store lesson history / レッスン履歴の保存 |
+| `host_permissions: nativecamp.net/*` | Access lesson history pages / レッスン履歴ページへのアクセス |
 
 ---
 
-## 注意事項
+## Notes / 注意事項
 
-- **個人利用のみ**を想定。スクレイピングの過度な実行は避けること
-- データはすべてローカルの `chrome.storage.local` に保存。外部送信なし
-- ネイティブキャンプ側の HTML 構造が変わるとパーサーが壊れる可能性がある（sanityCheck で検知）
+- **Personal use only / 個人利用のみ** — avoid excessive scraping. / スクレイピングの過度な実行は避けること
+- All data is stored locally in `chrome.storage.local`. No external transmission. / データはすべてローカルに保存。外部送信なし
+- If NativeCamp changes their HTML structure, the parser may break (detected by sanityCheck). / ネイティブキャンプ側の HTML 構造が変わるとパーサーが壊れる可能性がある（sanityCheck で検知）
