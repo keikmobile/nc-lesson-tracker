@@ -58,6 +58,7 @@
 ```json
 {
   "timestamp":       "2025-01-15T09:59:00",
+  "source":          "nativecamp",
   "course":          "デイリートピック",
   "level":           "ビジネス/経済",
   "topic":           "11496:Ways to Stay Motivated at Work",
@@ -73,6 +74,7 @@
 | フィールド | 型 | 内容 |
 |---|---|---|
 | `timestamp` | string (ISO 8601) | 受講日時 |
+| `source` | string | データソース（固定値: `"nativecamp"`） |
 | `course` | string \| null | コース名（例: デイリーニュース） |
 | `level` | string \| null | レベルまたはカテゴリ（例: 健康） |
 | `topic` | string \| null | トピック名（ID付きの場合あり） |

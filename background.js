@@ -128,7 +128,7 @@ function parseHTML(html, month) {
     const countryMatch = block.match(/<span class="country_name">([\s\S]*?)<\/span>/);
     const teacher_country = countryMatch ? countryMatch[1].trim() : null;
 
-    records.push({ timestamp, course, level, topic, textbook_url, duration_min, teacher_name_en, teacher_name_ja, teacher_country, month });
+    records.push({ timestamp, source: 'nativecamp', course, level, topic, textbook_url, duration_min, teacher_name_en, teacher_name_ja, teacher_country, month });
   }
 
   return records;
