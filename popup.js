@@ -87,29 +87,35 @@ function renderAnalysis() {
 }
 
 function buildAnalysisHTML(history) {
-  // コース別集計
-  const courseCount = {};
-  const topicCount = {};
-  const levelCount = {};
-  const monthCount = {};
+  // 集計
+  const lessonTypeCount     = {};
+  const topicCount          = {};
+  const levelCount          = {};
+  const monthCount          = {};
+  const teacherCountryCount = {};
+  const teacherCount        = {};
 
   for (const r of history) {
-    if (r.course) courseCount[r.course] = (courseCount[r.course] || 0) + 1;
-    if (r.topic)  topicCount[r.topic]  = (topicCount[r.topic]  || 0) + 1;
-    if (r.level)  levelCount[r.level]  = (levelCount[r.level]  || 0) + 1;
-    if (r.month)  monthCount[r.month]  = (monthCount[r.month]  || 0) + 1;
+    if (r.lesson_type)     lessonTypeCount[r.lesson_type]           = (lessonTypeCount[r.lesson_type]           || 0) + 1;
+    if (r.topic)           topicCount[r.topic]                      = (topicCount[r.topic]                      || 0) + 1;
+    if (r.level)           levelCount[r.level]                      = (levelCount[r.level]                      || 0) + 1;
+    if (r.month)           monthCount[r.month]                      = (monthCount[r.month]                      || 0) + 1;
+    if (r.teacher_country) teacherCountryCount[r.teacher_country]   = (teacherCountryCount[r.teacher_country]   || 0) + 1;
+    if (r.teacher_en)      teacherCount[r.teacher_en]               = (teacherCount[r.teacher_en]               || 0) + 1;
   }
 
-  const topCourses = sortedTop(courseCount, 10);
-  const topTopics  = sortedTop(topicCount, 15);
-  const topLevels  = sortedTop(levelCount, 10);
+  const topLessonTypes      = sortedTop(lessonTypeCount, 10);
+  const topTopics           = sortedTop(topicCount, 15);
+  const topLevels           = sortedTop(levelCount, 10);
+  const topTeacherCountries = sortedTop(teacherCountryCount, 10);
+  const topTeachers         = sortedTop(teacherCount, 15);
 
   // アクティブ月数
   const activeMonths = Object.keys(monthCount).length;
   const avgPerMonth = (history.length / activeMonths).toFixed(1);
 
-  // 最も多いコース
-  const topCourse = topCourses[0]?.[0] || '—';
+  // 最も多いレッスンタイプ
+  const topLessonType = topLessonTypes[0]?.[0] || '—';
 
   // 合計時間・平均時間を計算
   const durations = history.map(r => r.duration_min).filter(d => d != null && d > 0);
@@ -132,14 +138,16 @@ function buildAnalysisHTML(history) {
     </div>
     <div class="summary-grid">
       <div class="summary-card"><div class="num" style="font-size:16px">${avgMin === '—' ? '—' : avgMin + 'm'}</div><div class="lbl">平均レッスン時間</div></div>
-      <div class="summary-card" style="grid-column:${avgMin === '—' ? '2' : '2'}"><div class="lbl" style="margin-bottom:4px">最多コース</div><div style="font-size:11px;font-weight:600;color:#333">${topCourse}</div></div>
+      <div class="summary-card" style="grid-column:${avgMin === '—' ? '2' : '2'}"><div class="lbl" style="margin-bottom:4px">最多レッスンタイプ</div><div style="font-size:11px;font-weight:600;color:#333">${topLessonType}</div></div>
     </div>
   `;
 
-  html += `<div class="section-title">コース別</div>` + barChart(topCourses);
-  html += `<div class="section-title">トピック TOP15</div>` + barChart(topTopics);
-  if (topLevels.length > 0) {
-    html += `<div class="section-title">レベル別</div>` + barChart(topLevels);
+  if (topTeachers.length > 0) {
+    html += `<div class="section-title">講師 TOP15</div>` + barChart(topTeachers);
+  }
+  html += `<div class="section-title">レッスン種別</div>` + barChart(topLessonTypes);
+  if (topTeacherCountries.length > 0) {
+    html += `<div class="section-title">講師の国</div>` + barChart(topTeacherCountries);
   }
 
   // 時間帯別
@@ -166,6 +174,26 @@ function buildAnalysisHTML(history) {
         <div class="bar-count" style="width:52px">${count} <span style="color:#bbb">${pct}%</span></div>
       </div>`;
   }).join('');
+
+  // 月別推移
+  const monthEntries = Object.entries(monthCount).sort((a, b) => a[0].localeCompare(b[0]));
+  const monthMax = Math.max(...monthEntries.map(([, v]) => v));
+  html += `<div class="section-title">月別推移</div>`;
+  html += monthEntries.map(([m, count]) => {
+    const label = `${m.slice(0, 4)}/${m.slice(4, 6)}`;
+    return `
+      <div class="bar-row">
+        <div class="bar-label">${label}</div>
+        <div class="bar-wrap"><div class="bar-fill" style="width:${monthMax > 0 ? Math.round(count/monthMax*100) : 0}%"></div></div>
+        <div class="bar-count">${count}</div>
+      </div>`;
+  }).join('');
+
+  // NC固有: トピック・レベル
+  html += `<div class="section-title">トピック TOP15</div>` + barChart(topTopics);
+  if (topLevels.length > 0) {
+    html += `<div class="section-title">レベル別</div>` + barChart(topLevels);
+  }
 
   return html;
 }
@@ -198,15 +226,15 @@ function renderHistory() {
     }
     el.innerHTML = history.map(r => `
       <div class="h-item">
-        <div class="h-title">${r.topic || r.course || '(不明)'}</div>
+        <div class="h-title">${r.topic || r.lesson_type || '(不明)'}</div>
         <div class="h-meta">
           <span>${formatDate(r.timestamp)}</span>
-          ${r.course ? `<span class="badge">${r.course}</span>` : ''}
-          ${r.level  ? `<span class="badge">${r.level}</span>`  : ''}
+          ${r.lesson_type ? `<span class="badge">${r.lesson_type}</span>` : ''}
+          ${r.level       ? `<span class="badge">${r.level}</span>`       : ''}
         </div>
-        ${(r.teacher_name_en || r.teacher_country) ? `
+        ${(r.teacher_en || r.teacher_country) ? `
         <div class="h-teacher">
-          ${r.teacher_name_en ? `<span>${r.teacher_name_en}${r.teacher_name_ja ? ` (${r.teacher_name_ja})` : ''}</span>` : ''}
+          ${r.teacher_en ? `<span>${r.teacher_en}${r.teacher_ja ? ` (${r.teacher_ja})` : ''}</span>` : ''}
           ${r.teacher_country ? `<span class="badge">${r.teacher_country}</span>` : ''}
         </div>` : ''}
       </div>

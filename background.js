@@ -99,15 +99,15 @@ function parseHTML(html, month) {
       /<a class="t_link"[^>]*href="(https:\/\/nativecamp\.net\/textbook\/[^"]+)"[^>]*>([\s\S]*?)<\/a>/
     );
 
-    let course = null, level = null, topic = null, textbook_url = null;
+    let lesson_type = null, level = null, topic = null, textbook_url = null;
 
     if (tlinkMatch) {
       textbook_url = tlinkMatch[1];
       const inner = tlinkMatch[2];
       const spans = [...inner.matchAll(/<span[^>]*>([\s\S]*?)<\/span>/g)]
         .map(m => m[1].trim()).filter(Boolean);
-      course = spans[0] || null;
-      level  = spans[1] || null;
+      lesson_type = spans[0] || null;
+      level       = spans[1] || null;
       const noSpan = inner.replace(/<span[^>]*>[\s\S]*?<\/span>/g, '');
       const topicRaw = noSpan.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
       topic = topicRaw || null;
@@ -120,15 +120,15 @@ function parseHTML(html, month) {
       : null;
 
     // 講師名（英語・日本語）を取得
-    const teacherMatch = block.match(/<p class="teacher-name">[\s\S]*?<b>([\s\S]*?)<\/b>([\s\S]*?)<br>/);
-    const teacher_name_en = teacherMatch ? teacherMatch[1].trim() : null;
-    const teacher_name_ja = teacherMatch ? teacherMatch[2].replace(/<[^>]+>/g, '').trim() : null;
+    const teacherMatch = block.match(/<p class="teacher-name">[\s\S]*?<a[^>]*>[\s\S]*?<b>([\s\S]*?)<\/b>([\s\S]*?)<\/a>/);
+    const teacher_en = teacherMatch ? teacherMatch[1].trim() : null;
+    const teacher_ja = teacherMatch ? teacherMatch[2].replace(/<[^>]+>/g, '').trim() : null;
 
     // 国籍を取得
     const countryMatch = block.match(/<span class="country_name">([\s\S]*?)<\/span>/);
     const teacher_country = countryMatch ? countryMatch[1].trim() : null;
 
-    records.push({ timestamp, source: 'nativecamp', course, level, topic, textbook_url, duration_min, teacher_name_en, teacher_name_ja, teacher_country, month });
+    records.push({ timestamp, source: 'nativecamp', lesson_type, level, topic, textbook_url, duration_min, teacher_en, teacher_ja, teacher_country, month });
   }
 
   return records;
@@ -171,7 +171,7 @@ function sanityCheck(records, month) {
   const n = records.length;
   const checks = [
     [records.filter(r => !r.timestamp).length,           0.3, 'timestamp取得失敗', '日時フォーマット変化の可能性'],
-    [records.filter(r => !r.course).length,               0.5, 'course取得失敗',    '教材リンク構造変化の可能性'],
+    [records.filter(r => !r.lesson_type).length,          0.5, 'lesson_type取得失敗', '教材リンク構造変化の可能性'],
     [records.filter(r => r.duration_min == null).length,  0.5, 'duration取得失敗',  '受講時間属性変化の可能性'],
   ];
   for (const [count, threshold, label, reason] of checks) {

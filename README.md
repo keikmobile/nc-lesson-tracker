@@ -59,13 +59,13 @@
 {
   "timestamp":       "2025-01-15T09:59:00",
   "source":          "nativecamp",
-  "course":          "デイリートピック",
+  "lesson_type":     "デイリートピック",
   "level":           "ビジネス/経済",
   "topic":           "11496:Ways to Stay Motivated at Work",
   "textbook_url":    "https://nativecamp.net/textbook/page-detail/1/10001",
   "duration_min":    26,
-  "teacher_name_en": "Teacher Name",
-  "teacher_name_ja": "講師名",
+  "teacher_en":      "Teacher Name",
+  "teacher_ja":      "講師名",
   "teacher_country": "南アフリカ",
   "month":           "202501"
 }
@@ -75,13 +75,13 @@
 |---|---|---|
 | `timestamp` | string (ISO 8601) | 受講日時 |
 | `source` | string | データソース（固定値: `"nativecamp"`） |
-| `course` | string \| null | コース名（例: デイリーニュース） |
+| `lesson_type` | string \| null | レッスンタイプ（例: デイリーニュース） |
 | `level` | string \| null | レベルまたはカテゴリ（例: 健康） |
 | `topic` | string \| null | トピック名（ID付きの場合あり） |
 | `textbook_url` | string \| null | 教材の URL |
 | `duration_min` | number \| null | 受講時間（分） |
-| `teacher_name_en` | string \| null | 講師名（英語） |
-| `teacher_name_ja` | string \| null | 講師名（日本語） |
+| `teacher_en` | string \| null | 講師名（英語） |
+| `teacher_ja` | string \| null | 講師名（日本語） |
 | `teacher_country` | string \| null | 講師の国籍 |
 | `month` | string (YYYYMM) | 受講月 |
 
@@ -127,7 +127,7 @@ https://nativecamp.net/lesson-history/page:N?month=YYYYMM
 |---|---|---|
 | レコード件数が 0 | — | HTML 構造変化またはログイン切れ |
 | `timestamp` 取得失敗 | 30% 超 | 日時フォーマット変化の可能性 |
-| `course` 取得失敗 | 50% 超 | 教材リンク構造変化の可能性 |
+| `lesson_type` 取得失敗 | 50% 超 | 教材リンク構造変化の可能性 |
 | `duration_min` 取得失敗 | 50% 超 | 受講時間属性変化の可能性 |
 
 ### 警告が出たときの対処
