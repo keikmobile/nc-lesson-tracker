@@ -28,6 +28,8 @@ Scrapes NativeCamp lesson history pages (`/lesson-history`), stores lesson data 
 | Start month / 取得開始月 | Defaults to current month. Change via calendar. / デフォルトは今月。カレンダーで任意の月に変更可能 |
 | Fetch history / 履歴を取得 | Scrapes all pages from the specified month to current. / 指定月から今月まで全ページを順番にスクレイピング |
 | JSON import / JSONインポート | Load an existing JSON file and merge into storage. / 既存の JSON ファイルを読み込んでストレージにマージ |
+| JSON export / JSONエクスポート | Saves as `nativecamp-history-YYYY-MM-DD.json` |
+| Clear / 消去 | Deletes all data from storage. / ストレージの全データを削除 |
 
 **Merge behavior / マージ仕様**: Both scraping and import deduplicate by `timestamp`. If the same `timestamp` already exists, the new data overwrites it (supports re-scraping after field additions).
 スクレイプとインポートどちらも `timestamp` をキーに重複除去。同じ `timestamp` が既存にある場合は新しいデータで上書きする（フィールド追加時の再取得に対応）。
@@ -48,12 +50,6 @@ Scrapes NativeCamp lesson history pages (`/lesson-history`), stores lesson data 
 | Monthly trend / 月別推移 | Bar chart of lesson count per month / 月ごとの受講回数バーチャート |
 | Topic TOP15 *(NC only)* | Bar chart of top 15 topics / 上位15トピックの棒グラフ |
 | Level *(NC only)* | Bar chart by level/category / レベル・カテゴリ別棒グラフ |
-
-### History Tab / 履歴タブ
-
-- Lists all records in descending `timestamp` order. / 全レコードを `timestamp` 降順で一覧表示
-- **JSON export / JSONエクスポート**: Saves as `nativecamp-history-YYYY-MM-DD.json`
-- **Clear / 消去**: Deletes all data from storage. / ストレージの全データを削除
 
 ---
 

@@ -184,24 +184,31 @@
       font-size: 10px;
     }
 
-    /* toolbar */
-    .toolbar {
+    .action-row {
       display: flex;
-      gap: 6px;
-      padding: 8px 12px;
-      background: white;
-      border-bottom: 1px solid #eee;
+      gap: 8px;
+      margin-top: 10px;
     }
-    .toolbar button {
-      padding: 5px 10px;
+    #btn-export {
+      flex: 1;
+      padding: 8px;
+      background: #f0f8ff;
+      color: #00aaff;
+      border: 1.5px solid #00aaff;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    #btn-clear {
+      padding: 8px 12px;
+      background: #f1f1f1;
+      color: #888;
       border: none;
-      border-radius: 4px;
-      font-size: 11px;
+      border-radius: 6px;
+      font-size: 12px;
       cursor: pointer;
     }
-    #btn-export { background: #00aaff; color: white; }
-    #btn-clear { background: #f1f1f1; color: #555; }
-    #toolbar-count { margin-left: auto; font-size: 11px; color: #999; align-self: center; }
   </style>
 </head>
 <body>
@@ -214,7 +221,6 @@
 <div class="tabs">
   <div class="tab active" data-tab="scrape">取得</div>
   <div class="tab" data-tab="analysis">分析</div>
-  <div class="tab" data-tab="history">履歴</div>
 </div>
 
 <!-- 取得パネル -->
@@ -231,21 +237,15 @@
   <div id="scrape-status"></div>
   <div id="scrape-warnings" style="display:none;margin-top:8px;padding:8px 10px;background:#fffbeb;border:1px solid #f59e0b;border-radius:6px;font-size:11px;color:#92400e;line-height:1.8;"></div>
   <div class="meta-info" id="meta-info" style="display:none"></div>
+  <div class="action-row">
+    <button id="btn-export">📤 JSONエクスポート</button>
+    <button id="btn-clear">🗑 消去</button>
+  </div>
 </div>
 
 <!-- 分析パネル -->
 <div id="analysis-panel" class="panel">
   <div id="analysis-content"><div class="empty">先に「取得」タブで履歴を取得してください。</div></div>
-</div>
-
-<!-- 履歴パネル -->
-<div id="history-panel" class="panel">
-  <div class="toolbar">
-    <button id="btn-export">JSONエクスポート</button>
-    <button id="btn-clear">消去</button>
-    <span id="toolbar-count"></span>
-  </div>
-  <div id="history-list"></div>
 </div>
 
 <script src="popup.js"></script>
