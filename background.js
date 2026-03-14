@@ -5,11 +5,11 @@ function storageGet(keys) {
   return new Promise(resolve => chrome.storage.local.get(keys, resolve));
 }
 
-// timestamp キーで重複除去してマージ（既存 + 新規、新規優先）
+// source + timestamp キーで重複除去してマージ（既存 + 新規、新規優先）
 function mergeRecords(existing, incoming) {
   const map = {};
-  for (const r of existing) { if (r.timestamp) map[r.timestamp] = r; }
-  for (const r of incoming) { if (r.timestamp) map[r.timestamp] = r; }
+  for (const r of existing) { if (r.timestamp) map[`${r.source}_${r.timestamp}`] = r; }
+  for (const r of incoming) { if (r.timestamp) map[`${r.source}_${r.timestamp}`] = r; }
   return Object.values(map).sort((a, b) => b.timestamp.localeCompare(a.timestamp));
 }
 

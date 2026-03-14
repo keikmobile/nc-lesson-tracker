@@ -138,7 +138,7 @@ function buildAnalysisHTML(history) {
     </div>
     <div class="summary-grid">
       <div class="summary-card"><div class="num" style="font-size:16px">${avgMin === '—' ? '—' : avgMin + 'm'}</div><div class="lbl">平均レッスン時間</div></div>
-      <div class="summary-card" style="grid-column:${avgMin === '—' ? '2' : '2'}"><div class="lbl" style="margin-bottom:4px">最多レッスンタイプ</div><div style="font-size:11px;font-weight:600;color:#333">${topLessonType}</div></div>
+      <div class="summary-card" style="grid-column:${avgMin === '—' ? '2' : '2'}"><div class="lbl" style="margin-bottom:4px">最多レッスンタイプ</div><div style="font-size:11px;font-weight:600;color:#333">${escapeHtml(topLessonType)}</div></div>
     </div>
   `;
 
@@ -207,7 +207,7 @@ function barChart(entries) {
   const max = entries[0][1];
   return entries.map(([label, count]) => `
     <div class="bar-row">
-      <div class="bar-label" title="${label}">${label}</div>
+      <div class="bar-label" title="${escapeHtml(label)}">${escapeHtml(label)}</div>
       <div class="bar-wrap"><div class="bar-fill" style="width:${Math.round(count/max*100)}%"></div></div>
       <div class="bar-count">${count}</div>
     </div>
@@ -226,20 +226,29 @@ function renderHistory() {
     }
     el.innerHTML = history.map(r => `
       <div class="h-item">
-        <div class="h-title">${r.topic || r.lesson_type || '(不明)'}</div>
+        <div class="h-title">${escapeHtml(r.topic || r.lesson_type || '(不明)')}</div>
         <div class="h-meta">
           <span>${formatDate(r.timestamp)}</span>
-          ${r.lesson_type ? `<span class="badge">${r.lesson_type}</span>` : ''}
-          ${r.level       ? `<span class="badge">${r.level}</span>`       : ''}
+          ${r.lesson_type ? `<span class="badge">${escapeHtml(r.lesson_type)}</span>` : ''}
+          ${r.level       ? `<span class="badge">${escapeHtml(r.level)}</span>`       : ''}
         </div>
         ${(r.teacher_en || r.teacher_country) ? `
         <div class="h-teacher">
-          ${r.teacher_en ? `<span>${r.teacher_en}${r.teacher_ja ? ` (${r.teacher_ja})` : ''}</span>` : ''}
-          ${r.teacher_country ? `<span class="badge">${r.teacher_country}</span>` : ''}
+          ${r.teacher_en ? `<span>${escapeHtml(r.teacher_en)}${r.teacher_ja ? ` (${escapeHtml(r.teacher_ja)})` : ''}</span>` : ''}
+          ${r.teacher_country ? `<span class="badge">${escapeHtml(r.teacher_country)}</span>` : ''}
         </div>` : ''}
       </div>
     `).join('');
   });
+}
+
+function escapeHtml(str) {
+  if (str == null) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 }
 
 function formatDate(iso) {
@@ -272,6 +281,11 @@ document.getElementById('import-file').addEventListener('change', (e) => {
       return;
     }
 
+    // ラッパー形式 {schema_version, records: [...]} にも対応
+    if (!Array.isArray(imported) && Array.isArray(imported?.records)) {
+      imported = imported.records;
+    }
+
     // 配列でなければエラー
     if (!Array.isArray(imported)) {
       status.textContent = '❌ 有効なレッスン履歴JSONではありません。';
@@ -300,7 +314,8 @@ document.getElementById('import-file').addEventListener('change', (e) => {
 document.getElementById('btn-export').addEventListener('click', () => {
   chrome.runtime.sendMessage({ type: 'GET_HISTORY' }, (data) => {
     const history = data.nc_history || [];
-    const blob = new Blob([JSON.stringify(history, null, 2)], { type: 'application/json' });
+    const payload = { schema_version: 1, exported_at: new Date().toISOString(), records: history };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;

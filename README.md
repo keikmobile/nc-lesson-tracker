@@ -91,6 +91,21 @@ Scrapes NativeCamp lesson history pages (`/lesson-history`), stores lesson data 
 | `teacher_country` | string \| null | Teacher nationality / 講師の国籍 |
 | `month` | string (YYYYMM) | Lesson month / 受講月 |
 
+### Integration Field Compatibility / 統合時のフィールド互換性
+
+When exchanging JSON with [dmm-lesson-tracker](https://github.com/keikmobile/dmm-lesson-tracker), the following fields are absent on the other side (`null` or omitted). / [dmm-lesson-tracker](https://github.com/keikmobile/dmm-lesson-tracker) と JSON をやりとりする場合、以下のフィールドは相手側に存在しない（`null` または省略）。
+
+| Field / フィールド | DMM | NC |
+|---|---|---|
+| `teacher_url` | yes | no |
+| `lesson_lang` | yes | no |
+| `note_url` | yes | no |
+| `level` | no | yes |
+| `topic` | no | yes |
+| `textbook_url` | no | yes |
+
+Use the `source` field (`"dmm"` / `"nativecamp"`) to distinguish records. / `source` フィールド（`"dmm"` / `"nativecamp"`）でレコードを判別できる。
+
 ### Storage / ストレージ
 
 Saved in `chrome.storage.local` with the following keys. / `chrome.storage.local` に以下のキーで保存。
@@ -164,7 +179,16 @@ nc-tracker/
 | Permission / パーミッション | Purpose / 用途 |
 |---|---|
 | `storage` | Store lesson history / レッスン履歴の保存 |
-| `host_permissions: nativecamp.net/*` | Access lesson history pages / レッスン履歴ページへのアクセス |
+| `host_permissions: nativecamp.net/lesson-history/*` | Access lesson history pages only / レッスン履歴ページのみにアクセスを限定 |
+
+### Security / セキュリティ
+
+| Measure / 対策 | Detail / 内容 |
+|---|---|
+| Minimal permissions / 最小権限 | `host_permissions` is scoped to `/lesson-history/*` only — no broader site access. / `host_permissions` をレッスン履歴ページのみに限定し、ドメイン全体へのアクセスを防ぐ |
+| Content Security Policy | `script-src 'self'; object-src 'self'` — blocks inline scripts and external script loading. / インラインスクリプトと外部スクリプトの読み込みを禁止する |
+| XSS mitigation / XSS 対策 | All scraped data (teacher names, lesson types, topics, etc.) is HTML-escaped via `escapeHtml()` before being inserted into `innerHTML`. / スクレイプデータ（講師名・レッスン種別・トピック等）はすべて `escapeHtml()` でエスケープしてから `innerHTML` に挿入する |
+| No external transmission / 外部送信なし | All data stays in `chrome.storage.local`. Nothing leaves the browser. / すべてのデータは `chrome.storage.local` に留まり、外部への送信は一切行わない |
 
 ---
 
