@@ -159,7 +159,9 @@ async function scrapeAll(fromMonth) {
   return { total: allRecords.length, months: months.length, errors, warnings: allWarnings };
 }
 
+// ------------------------------------------------------------
 // 仕様変化検知（パーサーが壊れたことを検知する番犬）
+// ------------------------------------------------------------
 function sanityCheck(records, month) {
   const warnings = [];
 
@@ -181,4 +183,9 @@ function sanityCheck(records, month) {
   }
 
   return warnings;
+}
+
+// Node.js テスト用エクスポート（ブラウザでは module が未定義のため無害）
+if (typeof module !== 'undefined') {
+  module.exports = { mergeRecords, generateMonths, parseHTML, sanityCheck };
 }

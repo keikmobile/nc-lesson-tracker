@@ -16,8 +16,15 @@ Chrome Extension (Manifest V3) that scrapes NativeCamp lesson history, stores it
 2. Enable Developer mode / デベロッパーモードをオン
 3. Click "Load unpacked" → select this directory / 「パッケージ化されていない拡張機能を読み込む」→ このディレクトリを選択
 
-**No build, lint, or test commands** — there is no package.json or toolchain.
-**ビルド・lint・テストコマンドなし** — package.json やツールチェーンは存在しない。
+**Run tests / テスト実行:**
+```
+node --test test.js
+```
+Requires Node.js 18+. No npm install needed. Tests cover pure functions in `background.js` (`mergeRecords`, `generateMonths`, `parseHTML`, `sanityCheck`) and `escapeHtml`.
+Node.js 18+ 必須。npm install 不要。`background.js` の純粋関数と `escapeHtml` をカバーする。
+
+**No build or lint commands** — there is no package.json or toolchain.
+**ビルド・lint コマンドなし** — package.json やツールチェーンは存在しない。
 
 ## Architecture / アーキテクチャ
 
@@ -26,8 +33,8 @@ Single-page Chrome extension with three files:
 
 - **`background.js`** (Service Worker): Scrapes NativeCamp pages, parses HTML, deduplicates records, manages `chrome.storage.local`
   ネイティブキャンプのページをスクレイピングし、HTML をパース・重複除去して `chrome.storage.local` を管理する
-- **`popup.html`** / **`popup.js`**: Three-tab UI (取得/分析/履歴) that communicates with the service worker via `chrome.runtime.sendMessage`
-  3タブ UI（取得/分析/履歴）。`chrome.runtime.sendMessage` でサービスワーカーと通信する
+- **`popup.html`** / **`popup.js`**: Two-tab UI (取得/分析) that communicates with the service worker via `chrome.runtime.sendMessage`
+  2タブ UI（取得/分析）。`chrome.runtime.sendMessage` でサービスワーカーと通信する
 
 **Data flow / データフロー:** Popup triggers scrape → background.js fetches `https://nativecamp.net/lesson-history/page:N?month=YYYYMM` → parses HTML → deduplicates by `timestamp` → stores in `chrome.storage.local`
 
