@@ -6,6 +6,7 @@ document.querySelectorAll('.tab').forEach(tab => {
     tab.classList.add('active');
     document.getElementById(`${tab.dataset.tab}-panel`).classList.add('active');
     if (tab.dataset.tab === 'analysis') renderAnalysis();
+    if (tab.dataset.tab === 'history') renderHistory();
   });
 });
 
@@ -70,6 +71,34 @@ function showMeta(history) {
     レッスン総数: <b>${history.length}件</b><br>
     記録期間: <b>${months}ヶ月</b>
   `;
+}
+
+// ---- 履歴一覧 ----
+function renderHistory() {
+  chrome.runtime.sendMessage({ type: 'GET_HISTORY' }, (data) => {
+    const history = data.nc_history || [];
+    document.getElementById('toolbar-count').textContent = `${history.length}件`;
+    const el = document.getElementById('history-list');
+    if (history.length === 0) {
+      el.innerHTML = '<div class="empty" style="padding:30px;text-align:center;color:#aaa;">データなし</div>';
+      return;
+    }
+    el.innerHTML = history.map(r => `
+      <div class="h-item">
+        <div class="h-title">${escapeHtml(r.topic || r.lesson_type || '(不明)')}</div>
+        <div class="h-meta">
+          <span>${formatDate(r.timestamp)}</span>
+          ${r.lesson_type ? `<span class="badge">${escapeHtml(r.lesson_type)}</span>` : ''}
+          ${r.level       ? `<span class="badge">${escapeHtml(r.level)}</span>`       : ''}
+        </div>
+        ${(r.teacher_en || r.teacher_country) ? `
+        <div class="h-teacher">
+          ${r.teacher_en ? `<span>${escapeHtml(r.teacher_en)}${r.teacher_ja ? ` (${escapeHtml(r.teacher_ja)})` : ''}</span>` : ''}
+          ${r.teacher_country ? `<span class="badge">${escapeHtml(r.teacher_country)}</span>` : ''}
+        </div>` : ''}
+      </div>
+    `).join('');
+  });
 }
 
 // ---- 分析 ----
